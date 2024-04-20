@@ -65,8 +65,9 @@ def train_model(model, train_dataset, val_dataset, epochs, tokenizer):
         warmup_steps=500,
         weight_decay=0.01,
         logging_dir='./logs',
-        logging_steps=10,
-        evaluation_strategy="epoch",
+        logging_steps=50,
+        evaluation_strategy="steps",
+        eval_steps=500,
         save_strategy="epoch",
         load_best_model_at_end=True,
         metric_for_best_model='loss'
@@ -180,11 +181,9 @@ def active_learning_loop(initial_train_dataset, val_dataset, test_dataset, model
         trainer = train_model(model, initial_train_dataset, val_dataset, epochs=700, tokenizer=tokenizer)
         
         uncertain_samples, used_indices = select_uncertain_samples(model, test_dataset, num_samples_per_iter, used_indices)
-        print(f"Uncertain samples selected: {len(uncertain_samples)}, Used indices: {len(used_indices)}")
         
         samples_to_verify = DataLoader(uncertain_samples, batch_size=1, shuffle=False)
         verified_samples = verify_labels(model, tokenizer, samples_to_verify, label_list)
-        print(f"Number of verified samples: {len(verified_samples)}")
 
         if verified_samples:
             encodings, labels = prepare_for_custom_dataset(verified_samples)
@@ -249,14 +248,9 @@ def save_predictions(model, dataset, tokenizer, iteration, num_samples_per_iter,
 
 def main():
     texts, labels, categories = load_data('data/train.json')
-    print(f"Loaded {len(texts)} texts and {len(labels)} labels.")
     # Configuring the tokenizer to explicitly return or not return token_type_ids
     tokenizer = BertTokenizer.from_pretrained('bert-base-uncased', use_fast=True)
     inputs = tokenizer(texts, return_token_type_ids=True, truncation=True, padding=True, return_tensors="pt")
-    print(f"Tokenized inputs keys: {inputs.keys()}")  # Vérifier les clés
-
-    # Vérifiez également un exemple pour s'assurer que les token_type_ids sont présents
-    print(f"Example of token_type_ids: {inputs['token_type_ids'][0]}")
     #tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
     #inputs = tokenize_data(texts, tokenizer)
     dataset = CustomDataset(inputs, labels)
