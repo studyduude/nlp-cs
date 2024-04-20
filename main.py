@@ -177,7 +177,7 @@ def active_learning_loop(initial_train_dataset, val_dataset, test_dataset, model
 
     for iteration in range(num_iterations):
         print(f"--- Active Learning Iteration {iteration+1} ---")
-        trainer = train_model(model, initial_train_dataset, val_dataset, epochs=3, tokenizer=tokenizer)
+        trainer = train_model(model, initial_train_dataset, val_dataset, epochs=700, tokenizer=tokenizer)
         
         uncertain_samples, used_indices = select_uncertain_samples(model, test_dataset, num_samples_per_iter, used_indices)
         print(f"Uncertain samples selected: {len(uncertain_samples)}, Used indices: {len(used_indices)}")
@@ -272,7 +272,7 @@ def main():
     print(f"Train dataset size: {len(train_dataset)}, Validation dataset size: {len(val_dataset)}")
 
     model = BertForSequenceClassification.from_pretrained('bert-base-uncased', num_labels=len(categories))
-    final_model = active_learning_loop(train_dataset, val_dataset, test_dataset, model, tokenizer, num_iterations=2, num_samples_per_iter=3)
+    final_model = active_learning_loop(train_dataset, val_dataset, test_dataset, model, tokenizer, num_iterations=5, num_samples_per_iter=10)
 
 
 if __name__ == '__main__':
