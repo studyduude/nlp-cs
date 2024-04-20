@@ -65,11 +65,10 @@ def train_model(model, train_dataset, val_dataset, epochs, tokenizer):
         warmup_steps=500,
         weight_decay=0.01,
         logging_dir='./logs',
-        logging_steps=50,  # logs every 50 steps
-        evaluation_strategy="steps",  # Evaluates every 500 steps
-        eval_steps=500,  # Evaluate every 500 steps
-        save_strategy="steps",  # Save every 500 steps
-        save_steps=500,  # Save every 500 steps
+        logging_steps=50,
+        evaluation_strategy="steps",
+        eval_steps=500,
+        save_strategy="no",  # No periodic saving, only save at the end if `load_best_model_at_end` is True
         load_best_model_at_end=True,
         metric_for_best_model='loss'
     )
@@ -81,6 +80,7 @@ def train_model(model, train_dataset, val_dataset, epochs, tokenizer):
         data_collator=DataCollatorWithPadding(tokenizer=tokenizer, return_tensors="pt")
     )
     return trainer.train()
+
 
 
 
