@@ -60,30 +60,28 @@ def train_model(model, train_dataset, val_dataset, epochs, tokenizer):
     training_args = TrainingArguments(
         output_dir='./results',
         num_train_epochs=epochs,
-        per_device_train_batch_size=4, 
+        per_device_train_batch_size=4,
         per_device_eval_batch_size=64,
         warmup_steps=500,
         weight_decay=0.01,
         logging_dir='./logs',
-        logging_steps=50,
-        evaluation_strategy="steps",
-        eval_steps=500,
-        save_strategy="epoch",
+        logging_steps=50,  # logs every 50 steps
+        evaluation_strategy="steps",  # Evaluates every 500 steps
+        eval_steps=500,  # Evaluate every 500 steps
+        save_strategy="steps",  # Save every 500 steps
+        save_steps=500,  # Save every 500 steps
         load_best_model_at_end=True,
         metric_for_best_model='loss'
     )
-    
-    # Utilisez DataCollatorWithPadding pour gérer dynamiquement le padding
-    data_collator = DataCollatorWithPadding(tokenizer=tokenizer, return_tensors="pt")
-    
     trainer = Trainer(
         model=model,
         args=training_args,
         train_dataset=train_dataset,
         eval_dataset=val_dataset,
-        data_collator=data_collator
+        data_collator=DataCollatorWithPadding(tokenizer=tokenizer, return_tensors="pt")
     )
     return trainer.train()
+
 
 
 # Select uncertain samples
